@@ -1,12 +1,15 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset='UTF-8'/>
-  <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
-  <meta http-equiv='X-UA-Compatible' content='ie=edge'/>
+  <meta charset='UTF-8' />
+  <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+  <meta http-equiv='X-UA-Compatible' content='ie=edge' />
   <title>Document</title>
   <script src='js/index.js'></script>
-  <link rel='stylesheet' href='index.css'/>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel='stylesheet' href='index.css' />
 </head>
+
 <body>
   <div id='main'>
 
@@ -14,7 +17,7 @@
 
     <form id='github-form'>
       <input id='search' type='text' name='search'>
-      <input type='submit' name='submit'/>
+      <button type='button' name='submit' onclick="fetchData()"> </button>
     </form>
 
     <div id='github-container'>
@@ -25,9 +28,49 @@
       <ul id='repos-list'>
 
       </ul>
+      <script>
+        async function fetchData() {
+          let request = document.getElementById('search').value;
+          $("#github-container").html("Searching...");
+          let aRequest = `https://api.github.com/search/users?q=${encodeURIComponent(request)}`;
+          document.getElementById('github-container').value = null;
+          console.log(aRequest);
+          const response = await fetch(aRequest);
+          const data = await response.json();          
+          const match = [];
+          const maxResults = 10;
+          let i = 0;
+          data.items.forEach(o => {
+            if (i === maxResults) {
+              return;
+            }
+              match.push(
+                `<h1><a href="${o.url}" class="card">
+      <div class="card__name">
+        <span><font size="+1">${o.login}</span> 
+      </div>
+      <div class="card__image">
+        <img src="${o.avatar_url}" height="225" width="195" background="black"/>
+      </div>        
+      </a>
+      
+      <div class="synopsis">
+      <p><font size="-1">ID: ${o.id || "ID not valid!"} | Score: ${o.score || "No score found!"}</font></p>            
+      </div>
+      <hr />
+      </h1>`
+              )
+            $("#github-container").html(match.join("<br />"));
+            $("#user-list").html(o.login);
+            console.log(o.login);
+            i++;
+          });
+        }
+      </script>
     </div>
 
   </div>
 
 </body>
+
 </html>
